@@ -1,0 +1,186 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "14e7cf318a30d7ebcdff2dfca57a11e4",
+    "entities": [
+      {
+        "tableName": "system_stats",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER NOT NULL, `sessionId` TEXT, `cpuSystemLoad` REAL NOT NULL, `cpuLoadLevel` TEXT NOT NULL, `cpuRunningProcesses` INTEGER NOT NULL, `cpuOnlineCores` INTEGER NOT NULL, `cpuTemperatureC` REAL, `cpuContextSwitches` INTEGER NOT NULL, `cpuFreqMHzJson` TEXT NOT NULL, `memTotalMB` INTEGER NOT NULL, `memUsedMB` INTEGER NOT NULL, `memFreeMB` INTEGER NOT NULL, `memCachedMB` INTEGER NOT NULL, `memSwapTotalMB` INTEGER NOT NULL, `memSwapUsedMB` INTEGER NOT NULL, `batteryLevelPct` INTEGER NOT NULL, `batteryTemperatureC` REAL, `batteryVoltageMV` INTEGER, `batteryHealth` TEXT, `batteryStatus` TEXT, `storageInternalFreeGB` REAL NOT NULL, `storageInternalTotalGB` REAL NOT NULL, `networkWifiRssiDbm` INTEGER, `networkMobileRxMB` INTEGER NOT NULL, `networkMobileTxMB` INTEGER NOT NULL, `networkTotalRxMB` INTEGER NOT NULL, `networkTotalTxMB` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cpuSystemLoad",
+            "columnName": "cpuSystemLoad",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cpuLoadLevel",
+            "columnName": "cpuLoadLevel",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cpuRunningProcesses",
+            "columnName": "cpuRunningProcesses",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cpuOnlineCores",
+            "columnName": "cpuOnlineCores",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cpuTemperatureC",
+            "columnName": "cpuTemperatureC",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "cpuContextSwitches",
+            "columnName": "cpuContextSwitches",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cpuFreqMHzJson",
+            "columnName": "cpuFreqMHzJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memTotalMB",
+            "columnName": "memTotalMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memUsedMB",
+            "columnName": "memUsedMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memFreeMB",
+            "columnName": "memFreeMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memCachedMB",
+            "columnName": "memCachedMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memSwapTotalMB",
+            "columnName": "memSwapTotalMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memSwapUsedMB",
+            "columnName": "memSwapUsedMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "batteryLevelPct",
+            "columnName": "batteryLevelPct",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "batteryTemperatureC",
+            "columnName": "batteryTemperatureC",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "batteryVoltageMV",
+            "columnName": "batteryVoltageMV",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "batteryHealth",
+            "columnName": "batteryHealth",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "batteryStatus",
+            "columnName": "batteryStatus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "storageInternalFreeGB",
+            "columnName": "storageInternalFreeGB",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storageInternalTotalGB",
+            "columnName": "storageInternalTotalGB",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkWifiRssiDbm",
+            "columnName": "networkWifiRssiDbm",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "networkMobileRxMB",
+            "columnName": "networkMobileRxMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkMobileTxMB",
+            "columnName": "networkMobileTxMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkTotalRxMB",
+            "columnName": "networkTotalRxMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkTotalTxMB",
+            "columnName": "networkTotalTxMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '14e7cf318a30d7ebcdff2dfca57a11e4')"
+    ]
+  }
+}
