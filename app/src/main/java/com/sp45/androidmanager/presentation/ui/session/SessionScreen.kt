@@ -1,14 +1,43 @@
 package com.sp45.androidmanager.presentation.ui.session
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -18,13 +47,15 @@ import androidx.compose.ui.unit.dp
 import com.sp45.androidmanager.presentation.ui.main.StatsViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel,
+    innerPadding: PaddingValues,
     onNavigateToSessionDetail: (String) -> Unit = {},
 ) {
     val allSessions by viewModel.allSessions.collectAsState()
@@ -34,15 +65,12 @@ fun SessionScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier
-    ) { paddingValues ->
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding(innerPadding) // Use the padding from parent Scaffold
+                .padding(horizontal = 16.dp, vertical = 8.dp) // Only add horizontal padding
         ) {
             // Sessions Overview Card with storage refresh action
             SessionsOverviewCard(
@@ -51,7 +79,6 @@ fun SessionScreen(
                 storageUsed = databaseInfo.databaseSizeEstimate,
                 onRefreshStorage = {
                     viewModel.refreshDatabaseInfo()
-                    // optional: show snackbar feedback
                     scope.launch {
                         snackbarHostState.showSnackbar("Storage info refreshed", duration = SnackbarDuration.Short)
                     }
@@ -104,6 +131,12 @@ fun SessionScreen(
                 }
             }
         }
+
+        // Snackbar host positioned at the bottom
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 
     // Delete Session Confirmation Dialog
@@ -154,6 +187,8 @@ fun SessionScreen(
         )
     }
 }
+
+// Rest of the composables remain the same (SessionsOverviewCard, OverviewStat, SessionCard, etc.)
 
 @Composable
 private fun SessionsOverviewCard(

@@ -13,11 +13,13 @@ ksp = "2.2.0-2.0.2"
 gson = "2.11.0"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
+localbroadcastmanager = "1.1.0"
 navigationCompose = "2.9.3"
 roomVersion = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

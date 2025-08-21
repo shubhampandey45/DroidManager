@@ -6,10 +6,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.sp45.androidmanager.MainActivity
 import com.sp45.androidmanager.R
 import com.sp45.androidmanager.domain.model.SystemStats
@@ -31,9 +33,13 @@ class SystemMonitoringService : Service() {
     @Inject
     lateinit var repository: SystemStatsRepository
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     private var collectJob: Job? = null
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var currentSessionId: String? = null
+    private var collectCount = 0
 
     companion object {
         const val NOTIFICATION_ID = 1001
@@ -42,6 +48,18 @@ class SystemMonitoringService : Service() {
         const val ACTION_START_MONITORING = "START_MONITORING"
         const val ACTION_STOP_MONITORING = "STOP_MONITORING"
 
+        // Broadcast actions
+        const val ACTION_STATS_UPDATED = "com.sp45.androidmanager.STATS_UPDATED"
+        const val ACTION_SERVICE_STATE_CHANGED = "com.sp45.androidmanager.SERVICE_STATE_CHANGED"
+        const val EXTRA_STATS = "extra_stats"
+        const val EXTRA_COLLECT_COUNT = "extra_collect_count"
+        const val EXTRA_IS_RUNNING = "extra_is_running"
+
+        // SharedPreferences keys
+        const val PREF_SERVICE_RUNNING = "service_running"
+        const val PREF_SESSION_ID = "current_session_id"
+        const val PREF_COLLECT_COUNT = "collect_count"
+
         private const val TAG = "SystemMonitoringService"
     }
 
@@ -49,6 +67,9 @@ class SystemMonitoringService : Service() {
         super.onCreate()
         Log.d(TAG, "Service created")
         createNotificationChannel()
+
+        // Restore state if service was restarted
+        restoreState()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -59,24 +80,53 @@ class SystemMonitoringService : Service() {
         when (intent?.action) {
             ACTION_START_MONITORING -> startMonitoring()
             ACTION_STOP_MONITORING -> stopMonitoring()
-            else -> startMonitoring()
+            else -> {
+                // If no action specified and service is supposed to be running, restart monitoring
+                if (sharedPreferences.getBoolean(PREF_SERVICE_RUNNING, false)) {
+                    startMonitoring()
+                } else {
+                    stopMonitoring()
+                }
+            }
         }
 
-        return START_STICKY
+        return START_STICKY // This ensures service restarts if killed by system
+    }
+
+    private fun restoreState() {
+        val isRunning = sharedPreferences.getBoolean(PREF_SERVICE_RUNNING, false)
+        if (isRunning) {
+            currentSessionId = sharedPreferences.getString(PREF_SESSION_ID, null)
+            collectCount = sharedPreferences.getInt(PREF_COLLECT_COUNT, 0)
+            Log.d(TAG, "Restoring service state - running: $isRunning, session: $currentSessionId, count: $collectCount")
+        }
+    }
+
+    private fun saveState() {
+        sharedPreferences.edit().apply {
+            putBoolean(PREF_SERVICE_RUNNING, collectJob?.isActive == true)
+            putString(PREF_SESSION_ID, currentSessionId)
+            putInt(PREF_COLLECT_COUNT, collectCount)
+            apply()
+        }
     }
 
     private fun startMonitoring() {
         if (collectJob?.isActive == true) {
             Log.d(TAG, "Monitoring already active")
+            broadcastServiceState(true)
             return
         }
 
-        currentSessionId = "session_${System.currentTimeMillis()}"
+        currentSessionId = currentSessionId ?: "session_${System.currentTimeMillis()}"
         startForeground(NOTIFICATION_ID, createNotification("Starting monitoring..."))
+
+        // Save state and broadcast
+        saveState()
+        broadcastServiceState(true)
 
         collectJob = serviceScope.launch {
             Log.d(TAG, "Starting data collection loop with session: $currentSessionId")
-            var collectCount = 0
 
             try {
                 while (isActive) {
@@ -86,7 +136,7 @@ class SystemMonitoringService : Service() {
                         // Use repository to collect and store data
                         val insertedId = repository.collectAndStoreStats(currentSessionId)
 
-                        // Get the stats for notification update
+                        // Get the stats for notification update and broadcast
                         val systemStats = repository.collectCurrentSystemStats()
 
                         collectCount++
@@ -94,6 +144,12 @@ class SystemMonitoringService : Service() {
 
                         // Update notification with latest data
                         updateNotification(systemStats, collectCount)
+
+                        // Broadcast the updated stats
+                        broadcastStatsUpdate(systemStats, collectCount)
+
+                        // Save updated count
+                        saveState()
 
                     } catch (e: Exception) {
                         Log.e(TAG, "Error collecting/storing stats: ${e.message}", e)
@@ -117,8 +173,39 @@ class SystemMonitoringService : Service() {
         collectJob?.cancel()
         collectJob = null
         currentSessionId = null
+        collectCount = 0
+
+        // Clear state and broadcast
+        clearState()
+        broadcastServiceState(false)
+
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    private fun clearState() {
+        sharedPreferences.edit().apply {
+            putBoolean(PREF_SERVICE_RUNNING, false)
+            remove(PREF_SESSION_ID)
+            remove(PREF_COLLECT_COUNT)
+            apply()
+        }
+    }
+
+    private fun broadcastServiceState(isRunning: Boolean) {
+        val intent = Intent(ACTION_SERVICE_STATE_CHANGED).apply {
+            putExtra(EXTRA_IS_RUNNING, isRunning)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    private fun broadcastStatsUpdate(stats: SystemStats, count: Int) {
+        val intent = Intent(ACTION_STATS_UPDATED).apply {
+            // You might want to serialize stats or send specific values
+            putExtra(EXTRA_COLLECT_COUNT, count)
+            // Add other stats data as needed
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun createNotificationChannel() {
@@ -139,7 +226,9 @@ class SystemMonitoringService : Service() {
     }
 
     private fun createNotification(contentText: String = "Monitoring system parameters..."): Notification {
-        val notificationIntent = Intent(this, MainActivity::class.java)
+        val notificationIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         val pendingIntent = PendingIntent.getActivity(
             this, 0, notificationIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -165,6 +254,7 @@ class SystemMonitoringService : Service() {
                 "Stop",
                 stopPendingIntent
             )
+            .setPriority(NotificationCompat.PRIORITY_LOW) // Add explicit priority
             .build()
     }
 
@@ -178,14 +268,16 @@ class SystemMonitoringService : Service() {
 
             val contentText = when {
                 errorMessage != null -> errorMessage
-                stats != null -> "Collected $count samples | CPU: ${String.format("%.1f", stats.cpu.systemLoad)} | Battery: ${stats.battery.levelPct}%"
-                else -> "Collecting data... ($count samples)"
+                stats != null -> "Sample #$count | CPU: ${String.format("%.1f", stats.cpu.systemLoad)}% | Battery: ${stats.battery.levelPct}%"
+                else -> "Collecting sample #$count..."
             }
 
             val notification = createNotification(contentText)
             notificationManager.notify(NOTIFICATION_ID, notification)
+
+            Log.d(TAG, "Notification updated: $contentText")
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to update notification: ${e.message}")
+            Log.e(TAG, "Failed to update notification: ${e.message}", e)
         }
     }
 
@@ -193,6 +285,8 @@ class SystemMonitoringService : Service() {
         Log.d(TAG, "Service destroyed")
         collectJob?.cancel()
         serviceScope.cancel()
+        clearState()
+        broadcastServiceState(false)
         super.onDestroy()
     }
 }

@@ -17,12 +17,14 @@ import com.sp45.androidmanager.presentation.ui.components.DatabaseInfoCard
 import com.sp45.androidmanager.presentation.ui.components.StoredStatsCard
 import com.sp45.androidmanager.presentation.ui.main.DatabaseInfo
 import com.sp45.androidmanager.presentation.ui.main.StatsViewModel
+import androidx.compose.foundation.layout.padding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     viewModel: StatsViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(0.dp) // Add this parameter
 ) {
     val recentStoredStats by viewModel.recentStoredStats.collectAsState()
     val databaseInfo by viewModel.databaseInfo.collectAsState()
@@ -67,14 +69,12 @@ fun HistoryScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp, vertical = 8.dp) // Added top padding
         ) {
             // Enhanced Database Info Card with Actions
             DatabaseInfoCard(
@@ -214,6 +214,12 @@ fun HistoryScreen(
                 }
             }
         }
+
+        // Snackbar host positioned at the bottom
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 

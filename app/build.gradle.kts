@@ -80,6 +80,9 @@ dependencies {
     // Gson for JSON serialization (for List<Int> cpuFreqMHz)
     implementation(libs.gson)
 
+    // Navigation Compose
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.localbroadcastmanager)
 
 }

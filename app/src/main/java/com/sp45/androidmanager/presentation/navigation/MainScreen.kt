@@ -52,7 +52,6 @@ import com.sp45.androidmanager.presentation.ui.livestats.LiveStatsScreen
 import com.sp45.androidmanager.presentation.ui.main.Dashboard
 import com.sp45.androidmanager.presentation.ui.main.StatsViewModel
 import com.sp45.androidmanager.presentation.ui.session.SessionScreen
-import com.sp45.androidmanager.presentation.ui.settings.SettingsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -144,28 +143,24 @@ fun MainScreen(viewModel: StatsViewModel) {
                 }
             }
         ) { innerPadding ->
+            // REMOVE the Modifier.padding(innerPadding) here and let each screen handle it
             NavHost(
                 navController = navController,
                 startDestination = NavigationItem.Dashboard.route,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.fillMaxSize()
             ) {
                 composable(NavigationItem.Dashboard.route) {
-                    Dashboard(viewModel = viewModel)
+                    Dashboard(viewModel = viewModel, innerPadding = innerPadding)
                 }
                 composable(NavigationItem.LiveStats.route) {
-                    LiveStatsScreen(viewModel)
+                    LiveStatsScreen(viewModel, innerPadding = innerPadding)
                 }
                 composable(NavigationItem.Session.route) {
-                    SessionScreen(modifier = Modifier, viewModel)
+                    SessionScreen(modifier = Modifier, viewModel, innerPadding = innerPadding)
                 }
                 composable(NavigationItem.History.route) {
-                    HistoryScreen(viewModel)
+                    HistoryScreen(viewModel, innerPadding = innerPadding)
                 }
-//
-//                // Drawer destinations
-//                composable(DrawerItem.Settings.route) {
-//                    SettingsScreen(navController = navController)
-//                }
             }
         }
     }

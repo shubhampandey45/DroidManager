@@ -1,11 +1,16 @@
 package com.sp45.androidmanager.presentation.ui.main
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Build
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.sp45.androidmanager.data.database.toDomainModel
 import com.sp45.androidmanager.data.service.SystemMonitoringService
 import com.sp45.androidmanager.domain.model.SystemStats
@@ -26,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StatsViewModel @Inject constructor(
     private val repository: SystemStatsRepository,
+    private val sharedPreferences: SharedPreferences,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -38,9 +44,15 @@ class StatsViewModel @Inject constructor(
     val recentLiveSamples: StateFlow<List<SystemStats>> = _recentLiveSamples.asStateFlow()
     private val recentBufferSize = 40 // keep last 40 samples (~40 seconds at 1s interval)
 
-    // Service state
-    private val _serviceRunning = MutableStateFlow(false)
+    // Service state - Initialize from SharedPreferences
+    private val _serviceRunning = MutableStateFlow(
+        sharedPreferences.getBoolean(SystemMonitoringService.PREF_SERVICE_RUNNING, false)
+    )
     val serviceRunning: StateFlow<Boolean> = _serviceRunning.asStateFlow()
+
+    // Service stats tracking
+    private val _serviceCollectCount = MutableStateFlow(0)
+    val serviceCollectCount: StateFlow<Int> = _serviceCollectCount.asStateFlow()
 
     // Historical data from database - Updated to ensure fresh data
     val recentStoredStats = repository.getRecentStatsFlow(100)
@@ -64,14 +76,66 @@ class StatsViewModel @Inject constructor(
     private val _databaseInfo = MutableStateFlow(DatabaseInfo())
     val databaseInfo: StateFlow<DatabaseInfo> = _databaseInfo.asStateFlow()
 
+    private var liveUpdatesJob: Job? = null
+    private var broadcastReceiver: BroadcastReceiver? = null
+
     init {
         // Load initial database info
         viewModelScope.launch {
             updateDatabaseInfo()
         }
+
+        // Setup broadcast receiver for service updates
+        setupBroadcastReceiver()
+
+        // If service was running, start live updates
+        if (_serviceRunning.value) {
+            startLiveUpdates()
+        }
     }
 
-    private var liveUpdatesJob: Job? = null
+    private fun setupBroadcastReceiver() {
+        broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                when (intent?.action) {
+                    SystemMonitoringService.ACTION_SERVICE_STATE_CHANGED -> {
+                        val isRunning = intent.getBooleanExtra(
+                            SystemMonitoringService.EXTRA_IS_RUNNING,
+                            false
+                        )
+                        _serviceRunning.value = isRunning
+
+                        if (isRunning && liveUpdatesJob?.isActive != true) {
+                            startLiveUpdates()
+                        } else if (!isRunning) {
+                            stopLiveUpdates()
+                        }
+                    }
+
+                    SystemMonitoringService.ACTION_STATS_UPDATED -> {
+                        val count = intent.getIntExtra(
+                            SystemMonitoringService.EXTRA_COLLECT_COUNT,
+                            0
+                        )
+                        _serviceCollectCount.value = count
+
+                        // Refresh database info when service collects data
+                        viewModelScope.launch {
+                            updateDatabaseInfo()
+                        }
+                    }
+                }
+            }
+        }
+
+        val filter = IntentFilter().apply {
+            addAction(SystemMonitoringService.ACTION_SERVICE_STATE_CHANGED)
+            addAction(SystemMonitoringService.ACTION_STATS_UPDATED)
+        }
+
+        LocalBroadcastManager.getInstance(getApplication())
+            .registerReceiver(broadcastReceiver!!, filter)
+    }
 
     /**
      * Start real-time stats updates (for live display - 1 second intervals)
@@ -126,15 +190,24 @@ class StatsViewModel @Inject constructor(
         val intent = Intent(getApplication(), SystemMonitoringService::class.java).apply {
             action = SystemMonitoringService.ACTION_START_MONITORING
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getApplication<Application>().startForegroundService(intent)
-        } else {
-            getApplication<Application>().startService(intent)
-        }
-        _serviceRunning.value = true
 
-        // Also start live updates for immediate UI feedback
-        startLiveUpdates()
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getApplication<Application>().startForegroundService(intent)
+            } else {
+                getApplication<Application>().startService(intent)
+            }
+
+            // Don't immediately set service running - wait for broadcast
+            // _serviceRunning.value = true
+
+            // Start live updates for immediate UI feedback
+            startLiveUpdates()
+
+        } catch (e: Exception) {
+            // Handle service start failure
+            android.util.Log.e("StatsViewModel", "Failed to start service", e)
+        }
     }
 
     /**
@@ -144,11 +217,20 @@ class StatsViewModel @Inject constructor(
         val intent = Intent(getApplication(), SystemMonitoringService::class.java).apply {
             action = SystemMonitoringService.ACTION_STOP_MONITORING
         }
-        getApplication<Application>().startService(intent)
-        _serviceRunning.value = false
 
-        // Stop live updates as well
-        stopLiveUpdates()
+        try {
+            getApplication<Application>().startService(intent)
+
+            // Don't immediately set service stopped - wait for broadcast
+            // _serviceRunning.value = false
+
+            // Stop live updates as well
+            stopLiveUpdates()
+
+        } catch (e: Exception) {
+            // Handle service stop failure
+            android.util.Log.e("StatsViewModel", "Failed to stop service", e)
+        }
     }
 
     /**
@@ -258,6 +340,14 @@ class StatsViewModel @Inject constructor(
             repository.deleteSession(sessionId)
             updateDatabaseInfo()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        broadcastReceiver?.let {
+            LocalBroadcastManager.getInstance(getApplication()).unregisterReceiver(it)
+        }
+        liveUpdatesJob?.cancel()
     }
 }
 
