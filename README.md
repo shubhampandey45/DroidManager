@@ -74,8 +74,7 @@ com.sp45.androidmanager/
 - **Android System Services** - Battery, activity, and storage managers
 - **TrafficStats** - Network usage statistics
 
-### UI & Visualization
-- **Material Design 3, Compose Navigation**
+### Live Stats
 - **Custom Sparklines** - Real-time data visualization
 
 ### Other Components
