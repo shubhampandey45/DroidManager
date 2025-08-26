@@ -3,8 +3,26 @@
 Android device system vitals monitoring application that provides real-time insights into device performance, collects historical data, and offers real-time graphical analytics about your Android device's operation.
 
 
-## 📷 Demo & Screenshots
-Coming soon
+## 📷 Screenshots
+
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/f2770558-9d1e-4e73-acfe-62547f3b2f3c" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/2d0410cb-f4f2-43f6-bd1a-03fb74bf4782" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/32773f1a-ee10-4fab-990b-c018797d2348" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/bc3f23cf-253c-415e-b259-9baecd0a999d" width="200"></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/0f9a4947-1aaa-4fc0-81d1-e453cc5c6137" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/1b3b8e80-c333-412b-beb7-2b6e39f55d9d" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/fc5590fe-91dc-4ad3-892b-fbb39a54c8a2" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/f1284e08-154d-48e2-9fc0-9b9396de9bb7" width="200"></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/5189a18d-4129-46bf-8d2c-78bafb91c83a" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/cf95c46d-c9e8-4499-9bda-4eac72419a91" width="200"></td>
+  </tr>
+</table>
 
 ## 📥 Download
 Coming soon
