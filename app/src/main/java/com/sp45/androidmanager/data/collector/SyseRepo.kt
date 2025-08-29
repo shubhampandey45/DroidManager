@@ -26,9 +26,7 @@ import java.io.InputStreamReader
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * System information collector - now injectable and properly structured
- */
+// System information collector
 @Singleton
 class SystemDataCollector @Inject constructor() {
 

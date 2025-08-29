@@ -42,6 +42,10 @@ android {
     buildFeatures {
         compose = true
     }
+    // For widget
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
 
     room {
         schemaDirectory("$projectDir/schemas")
@@ -84,5 +88,11 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.androidx.localbroadcastmanager)
+
+    // For AppWidgets support
+    implementation(libs.androidx.glance.appwidget)
+
+    // For interop APIs with Material 3
+    implementation(libs.androidx.glance.material3)
 
 }

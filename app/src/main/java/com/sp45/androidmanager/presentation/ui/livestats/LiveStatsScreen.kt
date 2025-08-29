@@ -43,6 +43,13 @@ fun LiveStatsScreen(
     ) {
         // Live Stats Section with Sparklines
         liveStats?.let { stats ->
+            // Live Performance Summary
+            item {
+                LivePerformanceSummaryCard(
+                    stats = stats,
+                    recentSamples = recentLiveSamples
+                )
+            }
             // Live cards with sparklines
             item {
                 LiveCpuCard(
@@ -59,14 +66,6 @@ fun LiveStatsScreen(
             item {
                 LiveBatteryCard(
                     currentStats = stats.battery,
-                    recentSamples = recentLiveSamples
-                )
-            }
-
-            // Live Performance Summary
-            item {
-                LivePerformanceSummaryCard(
-                    stats = stats,
                     recentSamples = recentLiveSamples
                 )
             }
