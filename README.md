@@ -25,7 +25,8 @@ Android device system vitals monitoring application that provides real-time insi
 </table>
 
 ## 📥 Download
-Coming soon
+Drive link - https://drive.google.com/drive/folders/1bzlNXCM_JkP70SPpzFM5wzVw-87atg2B?usp=sharing
+<p> (App is currently in development phase so this file ensure we can get feedback on latest version) </p>
 
 ## ✨ Features
 
