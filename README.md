@@ -21,7 +21,9 @@ Android device system vitals monitoring application that provides real-time insi
   <tr>
     <td><img src="https://github.com/user-attachments/assets/5189a18d-4129-46bf-8d2c-78bafb91c83a" width="200"></td>
     <td><img src="https://github.com/user-attachments/assets/cf95c46d-c9e8-4499-9bda-4eac72419a91" width="200"></td>
+    <td><img src="https://github.com/user-attachments/assets/c55f007c-679c-4e08-b34c-0bbe7c9fc6a8" width="200"></td>
   </tr>
+
 </table>
 
 ## 📥 Download
