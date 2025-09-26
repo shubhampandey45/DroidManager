@@ -27,8 +27,11 @@ Android device system vitals monitoring application that provides real-time insi
 </table>
 
 ## 📥 Download
-Drive link - https://drive.google.com/drive/folders/1bzlNXCM_JkP70SPpzFM5wzVw-87atg2B?usp=sharing
-<p> (App is currently in development phase so this file ensure we can get feedback on latest version) </p>
+<p align="">
+  <a href="https://github.com/shubhampandey45/DroidManager/releases/download/v0.1.0-alpha/app-debug.apk">
+    <img src="https://img.shields.io/badge/Download-Droid Manager-green?style=for-the-badge&logo=windows" />
+  </a>
+</p>
 
 ## ✨ Features
 
