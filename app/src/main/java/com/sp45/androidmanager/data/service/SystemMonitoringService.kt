@@ -36,6 +36,9 @@ class SystemMonitoringService : Service() {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
+    @Inject
+    lateinit var alertNotificationManager: AlertNotificationManager
+
     private var collectJob: Job? = null
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var currentSessionId: String? = null
@@ -61,6 +64,7 @@ class SystemMonitoringService : Service() {
         const val PREF_COLLECT_COUNT = "collect_count"
 
         private const val TAG = "SystemMonitoringService"
+        private const val CPU_USAGE_THRESHOLD = 80.0
     }
 
     override fun onCreate() {
@@ -138,6 +142,16 @@ class SystemMonitoringService : Service() {
 
                         // Get the stats for notification update and broadcast
                         val systemStats = repository.collectCurrentSystemStats()
+
+                        // Check for high CPU usage and send alert
+                        if (systemStats.cpu.systemLoad > CPU_USAGE_THRESHOLD) {
+                            try {
+                                alertNotificationManager.showCpuAlert()
+                                Log.d(TAG, "High CPU usage detected (>${CPU_USAGE_THRESHOLD}%), triggering alert.")
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Failed to show CPU alert: ${e.message}", e)
+                            }
+                        }
 
                         collectCount++
                         Log.d(TAG, "Collected stats #$collectCount, inserted with ID: $insertedId")
