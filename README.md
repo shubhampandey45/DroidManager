@@ -2,6 +2,7 @@
 
 Android device system vitals monitoring application that provides real-time insights into device performance, collects historical data, and offers real-time graphical analytics about your Android device's operation.
 
+![Droid Manager](https://github.com/user-attachments/assets/000babb7-3772-41ff-b26c-909877209dc1)
 
 ## 📷 Screenshots
 
