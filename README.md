@@ -5,25 +5,10 @@ Android device system vitals monitoring application that provides real-time insi
 ![Droid Manager](https://github.com/user-attachments/assets/000babb7-3772-41ff-b26c-909877209dc1)
 
 ## 📷 Screenshots
-
-<table>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/f2770558-9d1e-4e73-acfe-62547f3b2f3c" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/2d0410cb-f4f2-43f6-bd1a-03fb74bf4782" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/32773f1a-ee10-4fab-990b-c018797d2348" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/bc3f23cf-253c-415e-b259-9baecd0a999d" width="200"></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/0f9a4947-1aaa-4fc0-81d1-e453cc5c6137" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/1b3b8e80-c333-412b-beb7-2b6e39f55d9d" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/fc5590fe-91dc-4ad3-892b-fbb39a54c8a2" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/f1284e08-154d-48e2-9fc0-9b9396de9bb7" width="200"></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/5189a18d-4129-46bf-8d2c-78bafb91c83a" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/cf95c46d-c9e8-4499-9bda-4eac72419a91" width="200"></td>
-    <td><img src="https://github.com/user-attachments/assets/c55f007c-679c-4e08-b34c-0bbe7c9fc6a8" width="200"></td>
-  </tr>
+![7](https://github.com/user-attachments/assets/02248ae1-3640-4fbb-b365-b144aadd07ed)
+![8](https://github.com/user-attachments/assets/f763acb6-7835-4c5b-ad6a-9c15b55fc7a3)
+![9](https://github.com/user-attachments/assets/45641d04-cfc8-4466-aaf2-39c3fdaa1b6c)
+  
 
 </table>
 
