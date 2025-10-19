@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DroidManager</string>
+    <string name="system_stats_widget_description">Displays system statistics like CPU and Memory usage.</string>
 </resources>
